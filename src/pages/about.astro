@@ -1,0 +1,95 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Seo from '../components/Seo.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { breadcrumbSchema, graph, type Crumb } from '../lib/schema.ts';
+import { SITE } from '../lib/site.ts';
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'About', href: '/about' },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="About"
+		description="How the hairstyle previews are made, why they are illustrations rather than photographs, and what this site does and does not do."
+		path="/about"
+	>
+		<script type="application/ld+json" is:inline set:html={graph(breadcrumbSchema(crumbs))} />
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<article class="container-prose py-10 pb-16">
+		<h1 class="text-4xl leading-[1.05] sm:text-5xl">About {SITE.name}</h1>
+		<div class="editorial mt-8">
+			<p>
+				This is a hairstyle catalogue with a preview tool attached. You can browse 45 cuts,
+				read what each one actually demands of you, and then put any of them on a photo of
+				your own face to see roughly how the shape sits.
+			</p>
+
+			<h2>How the previews work</h2>
+			<p>
+				Every hairstyle here is a drawn asset, built from a parametric model of a head. Each
+				one records where a person's eyes sit relative to the hair. When you click your own
+				two eyes on your photo, the browser solves the transform that maps those two points
+				onto yours — which fixes the scale, the rotation and the position in one step — and
+				composites the hair onto the image.
+			</p>
+			<p>
+				That is all it is: geometry and image compositing, running in your browser. There is
+				no machine learning, no image generation, and no server involved in producing the
+				result.
+			</p>
+
+			<h2>What the previews are not</h2>
+			<p>
+				They are <strong>illustrations, not photographs</strong>. The hair is drawn rather
+				than photographed, so a preview shows you the silhouette, the volume and roughly
+				where the hairline will sit — not what your actual hair will look like in that cut.
+			</p>
+			<p>
+				That distinction matters. Use a preview to rule shapes in and out and to see how a
+				fade height or a fringe length changes your proportions. Do not use it as a
+				photorealistic prediction, because it is not one and nothing that runs entirely in a
+				browser without a model behind it could be.
+			</p>
+
+			<h2>Your photo</h2>
+			<p>
+				Your photo never leaves your device. It is read directly into a canvas element and
+				discarded when you close the tab. There is no upload, no account, and no analytics
+				attached to it. You can verify this yourself by opening your browser's network panel
+				while you use the studio — there will be no outbound request carrying your image.
+			</p>
+			<p>
+				More detail is on the <a href="/privacy">privacy page</a>.
+			</p>
+
+			<h2>The written guidance</h2>
+			<p>
+				The advice on each hairstyle page is written to be useful rather than encouraging.
+				Where a cut demands a fortnightly barber visit, it says so. Where a face shape is a
+				poor match, it says that too, and suggests the closer alternative. A catalogue that
+				tells you everything suits you is not a catalogue, it is a shop window.
+			</p>
+		</div>
+
+		<div class="mt-12 rounded-card border border-copper-200 bg-copper-50 p-6 text-center sm:p-8">
+			<h2 class="font-display text-2xl">Try it yourself</h2>
+			<p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-600">
+				A photo, two clicks, and 45 hairstyles to move through.
+			</p>
+			<a
+				href="/try"
+				class="mt-5 inline-flex rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-copper-600"
+			>
+				Open the studio
+			</a>
+		</div>
+	</article>
+</BaseLayout>

@@ -1,0 +1,59 @@
+---
+/**
+ * Single source of head metadata. Every page renders exactly one of these.
+ * JSON-LD is passed through the default slot so each page controls its own
+ * entity graph while the shared tags stay identical everywhere.
+ */
+import { abs, SITE } from '../lib/site.ts';
+
+interface Props {
+	title: string;
+	description: string;
+	/** Site-relative path, without a trailing slash. */
+	path: string;
+	image?: string;
+	imageAlt?: string;
+	type?: 'website' | 'article';
+	noindex?: boolean;
+	updated?: Date;
+}
+
+const {
+	title,
+	description,
+	path,
+	image = '/og-default.png',
+	imageAlt = SITE.name,
+	type = 'website',
+	noindex = false,
+	updated,
+} = Astro.props;
+
+const canonical = abs(path);
+const ogImage = abs(image);
+const fullTitle = path === '/' ? title : `${title} | ${SITE.name}`;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+{!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={imageAlt} />
+{updated && <meta property="article:modified_time" content={updated.toISOString()} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={imageAlt} />
+
+<slot />

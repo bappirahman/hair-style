@@ -1,0 +1,256 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import HairstyleCard from '../../components/HairstyleCard.astro';
+import Seo from '../../components/Seo.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { facetCounts, getAllHairstyles, getCategories } from '../../lib/catalog.ts';
+import { hairImage } from '../../lib/images.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../../lib/schema.ts';
+import {
+	FACE_SHAPES,
+	FACE_SHAPE_LABEL,
+	HAIR_TYPES,
+	HAIR_TYPE_LABEL,
+	LENGTHS,
+	LENGTH_LABEL,
+	type Category,
+} from '../../lib/taxonomy.ts';
+
+const styles = await getAllHairstyles();
+const categories = await getCategories();
+const counts = await facetCounts();
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Hairstyles', href: '/hairstyles' },
+];
+
+const filterGroups = [
+	{
+		key: 'categories',
+		label: 'Category',
+		options: categories.map((c) => ({
+			value: c.id,
+			label: c.data.name,
+			count: counts.categories.get(c.id as Category) ?? 0,
+		})),
+	},
+	{
+		key: 'length',
+		label: 'Length',
+		options: LENGTHS.map((l) => ({
+			value: l,
+			label: LENGTH_LABEL[l],
+			count: counts.lengths.get(l) ?? 0,
+		})),
+	},
+	{
+		key: 'hair-types',
+		label: 'Hair type',
+		options: HAIR_TYPES.map((t) => ({
+			value: t,
+			label: HAIR_TYPE_LABEL[t],
+			count: counts.hairTypes.get(t) ?? 0,
+		})),
+	},
+	{
+		key: 'face-shapes',
+		label: 'Face shape',
+		options: FACE_SHAPES.map((s) => ({
+			value: s,
+			label: FACE_SHAPE_LABEL[s],
+			count: counts.faceShapes.get(s) ?? 0,
+		})),
+	},
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="All Hairstyles — 45 Cuts to Browse and Try On"
+		description="Browse every hairstyle in the catalogue. Filter by category, length, hair type and face shape, then preview any of them on your own photo."
+		path="/hairstyles"
+		image={hairImage(styles[0]!.data.overlay).src}
+		imageAlt={styles[0]!.data.imageAlt}
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					styles.map((s) => ({
+						name: s.data.name,
+						href: `/hairstyles/${s.id}`,
+						image: hairImage(s.data.overlay).src,
+					})),
+					'All hairstyles',
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6">
+		<Breadcrumbs crumbs={crumbs} />
+	</div>
+
+	<header class="container-page pt-6 pb-2">
+		<p class="eyebrow">The catalogue</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">
+			Every hairstyle, in one place
+		</h1>
+		<p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+			{counts.total} cuts across fades, tapers, crops, quiffs, curls and everything in between —
+			each with the face shapes it flatters, the upkeep it demands and a preview you can put on
+			your own photo.
+		</p>
+	</header>
+
+	<div class="container-page py-8" data-catalog>
+		<form class="grid gap-5 border-y border-stone-200 py-6" role="search" data-filters>
+			<div class="flex flex-wrap items-end gap-4">
+				<label class="flex-1 min-w-56">
+					<span class="eyebrow">Search</span>
+					<input
+						type="search"
+						name="q"
+						placeholder="Fade, crop, curls&hellip;"
+						autocomplete="off"
+						class="mt-2 w-full rounded-full border border-stone-300 bg-paper px-4 py-2.5 text-sm placeholder:text-stone-400 focus:border-copper-400 focus:outline-none"
+					/>
+				</label>
+				<button
+					type="reset"
+					class="rounded-full border border-stone-300 px-4 py-2.5 text-sm transition-colors hover:border-ink"
+				>
+					Clear all
+				</button>
+			</div>
+
+			{
+				filterGroups.map((group) => (
+					<fieldset>
+						<legend class="eyebrow">{group.label}</legend>
+						<div class="mt-2.5 flex flex-wrap gap-2">
+							{group.options.map((option) => (
+								<label class="cursor-pointer">
+									<input
+										type="checkbox"
+										name={group.key}
+										value={option.value}
+										class="peer sr-only"
+									/>
+									<span class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 px-3 py-1.5 text-xs transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-copper-500 hover:border-stone-500">
+										{option.label}
+										<span class="text-stone-400 peer-checked:text-stone-300">{option.count}</span>
+									</span>
+								</label>
+							))}
+						</div>
+					</fieldset>
+				))
+			}
+		</form>
+
+		<p class="mt-6 text-sm text-stone-500" role="status" data-count>
+			Showing all {counts.total} hairstyles
+		</p>
+
+		<ul
+			role="list"
+			class="mt-5 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4"
+			data-results
+		>
+			{
+				styles.map((style, i) => (
+					<li class="contents">
+						<HairstyleCard style={style} eager={i < 4} />
+					</li>
+				))
+			}
+		</ul>
+
+		<p class="mt-10 hidden text-center text-stone-500" data-empty>
+			No hairstyles match those filters.
+			<button type="button" class="underline underline-offset-4" data-clear>Clear them</button> to see
+			everything again.
+		</p>
+	</div>
+</BaseLayout>
+
+<script>
+	/**
+	 * Filters the already-rendered cards in place. No data is re-fetched and no
+	 * DOM is created — every card exists in the HTML, so the page works fully
+	 * without this script and crawlers see all 45 entries.
+	 */
+	const root = document.querySelector<HTMLElement>('[data-catalog]');
+	const form = root?.querySelector<HTMLFormElement>('[data-filters]');
+	const results = root?.querySelector<HTMLElement>('[data-results]');
+	const countEl = root?.querySelector<HTMLElement>('[data-count]');
+	const emptyEl = root?.querySelector<HTMLElement>('[data-empty]');
+
+	if (root && form && results && countEl && emptyEl) {
+		const filters = form;
+		const status = countEl;
+		const empty = emptyEl;
+		const items = Array.from(results.children) as HTMLElement[];
+		const cards = items.map((li) => li.querySelector<HTMLElement>('[data-name]')!);
+
+		const checked = (name: string) =>
+			Array.from(
+				filters.querySelectorAll<HTMLInputElement>(`input[name="${name}"]:checked`),
+			).map((input) => input.value);
+
+		const tokens = (card: HTMLElement, attr: string) =>
+			(card.dataset[attr] ?? '').split(' ').filter(Boolean);
+
+		function apply() {
+			const query = (filters.querySelector<HTMLInputElement>('input[name="q"]')?.value ?? '')
+				.trim()
+				.toLowerCase();
+			const cats = checked('categories');
+			const lengths = checked('length');
+			const types = checked('hair-types');
+			const shapes = checked('face-shapes');
+
+			let shown = 0;
+			cards.forEach((card, i) => {
+				const matches =
+					(!query || (card.dataset.name ?? '').includes(query)) &&
+					(!cats.length || cats.some((c) => tokens(card, 'categories').includes(c))) &&
+					(!lengths.length || lengths.includes(card.dataset.length ?? '')) &&
+					(!types.length || types.some((t) => tokens(card, 'hairTypes').includes(t))) &&
+					(!shapes.length || shapes.some((s) => tokens(card, 'faceShapes').includes(s)));
+
+				items[i]!.classList.toggle('hidden', !matches);
+				// `display: contents` on the wrapper means the card itself must be
+				// hidden too, or the grid still reserves a cell for it.
+				card.classList.toggle('hidden', !matches);
+				if (matches) shown++;
+			});
+
+			status.textContent =
+				shown === cards.length
+					? `Showing all ${cards.length} hairstyles`
+					: `Showing ${shown} of ${cards.length} hairstyles`;
+			empty.classList.toggle('hidden', shown > 0);
+		}
+
+		filters.addEventListener('input', apply);
+		filters.addEventListener('reset', () => requestAnimationFrame(apply));
+		root.querySelector('[data-clear]')?.addEventListener('click', () => {
+			filters.reset();
+			apply();
+		});
+
+		// A ?q= arrival from the site search action lands pre-filtered.
+		const initial = new URLSearchParams(location.search).get('q');
+		if (initial) {
+			const input = filters.querySelector<HTMLInputElement>('input[name="q"]');
+			if (input) input.value = initial;
+			apply();
+		}
+	}
+</script>

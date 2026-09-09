@@ -1,0 +1,99 @@
+---
+import { render } from 'astro:content';
+
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import HairstyleGrid from '../../components/HairstyleGrid.astro';
+import Seo from '../../components/Seo.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { byCategory, getCategories, type CategoryEntry } from '../../lib/catalog.ts';
+import { hairImage } from '../../lib/images.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../../lib/schema.ts';
+import type { Category } from '../../lib/taxonomy.ts';
+
+export async function getStaticPaths() {
+	const categories = await getCategories();
+	return categories.map((entry) => ({
+		params: { category: entry.id },
+		props: { entry },
+	}));
+}
+
+interface Props {
+	entry: CategoryEntry;
+}
+const { entry } = Astro.props;
+const styles = await byCategory(entry.id as Category);
+const { Content } = await render(entry);
+const path = `/categories/${entry.id}`;
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Hairstyles', href: '/hairstyles' },
+	{ name: entry.data.name, href: path },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title={entry.data.seoTitle}
+		description={entry.data.seoDescription}
+		path={path}
+		image={styles[0] ? hairImage(styles[0].data.overlay).src : undefined}
+		imageAlt={styles[0]?.data.imageAlt}
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					styles.map((s) => ({
+						name: s.data.name,
+						href: `/hairstyles/${s.id}`,
+						image: hairImage(s.data.overlay).src,
+					})),
+					`${entry.data.name} hairstyles`,
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6">
+		<Breadcrumbs crumbs={crumbs} />
+	</div>
+
+	<header class="container-page pt-6">
+		<p class="eyebrow">Category</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">
+			{entry.data.name} hairstyles
+		</h1>
+		<p class="mt-4 max-w-2xl text-lg leading-relaxed text-stone-600">{entry.data.tagline}</p>
+	</header>
+
+	<section aria-label={`${entry.data.name} hairstyles`} class="container-page py-10">
+		<HairstyleGrid styles={styles} eagerCount={4} />
+	</section>
+
+	<div class="container-prose pb-8">
+		<div class="editorial border-t border-stone-200 pt-10">
+			<Content />
+		</div>
+	</div>
+
+	<div class="container-page pb-16">
+		<div class="rounded-card border border-copper-200 bg-copper-50 p-6 text-center sm:p-8">
+			<h2 class="font-display text-2xl">Not sure which one?</h2>
+			<p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-600">
+				Upload a photo and try every {entry.data.name.toLowerCase()} in this list on your own
+				face. It takes about a minute and nothing leaves your browser.
+			</p>
+			<a
+				href="/try"
+				class="mt-5 inline-flex rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-copper-600"
+			>
+				Open the studio
+			</a>
+		</div>
+	</div>
+</BaseLayout>

@@ -1,0 +1,68 @@
+---
+import { Image } from 'astro:assets';
+
+import { hairImage } from '../lib/images.ts';
+
+/**
+ * A static before/after diptych. Deliberately not an interactive slider: this
+ * appears above the fold on the homepage and is worth zero bytes of JavaScript.
+ * The draggable comparison lives in the studio, where it earns its cost.
+ */
+const plates = import.meta.glob<{ default: ImageMetadata }>('../assets/demo/*.webp', {
+	eager: true,
+});
+
+interface Props {
+	overlay: string;
+	tone: 'fair' | 'olive' | 'deep';
+	label: string;
+	alt: string;
+	eager?: boolean;
+}
+const { overlay, tone, label, alt, eager = false } = Astro.props;
+
+const before = plates[`../assets/demo/before-${tone}.webp`]!.default;
+const after = hairImage(overlay);
+const loading = eager ? 'eager' : 'lazy';
+---
+
+<figure class="overflow-hidden rounded-card border border-stone-200 bg-paper shadow-lift">
+	<div class="grid grid-cols-2">
+		<div class="relative border-r border-stone-200">
+			<Image
+				src={before}
+				alt="The same illustrated head before any hairstyle is applied"
+				widths={[240, 360]}
+				sizes="(min-width: 640px) 12rem, 44vw"
+				loading={loading}
+				decoding="async"
+				class="aspect-4/5 w-full object-cover"
+			/>
+			<span
+				class="absolute bottom-2 left-2 rounded-full bg-ivory/90 px-2 py-0.5 text-2xs font-medium text-stone-600"
+			>
+				Before
+			</span>
+		</div>
+		<div class="relative">
+			<Image
+				src={after}
+				alt={alt}
+				widths={[240, 360]}
+				sizes="(min-width: 640px) 12rem, 44vw"
+				loading={loading}
+				decoding="async"
+				fetchpriority={eager ? 'high' : 'auto'}
+				class="aspect-4/5 w-full object-cover"
+			/>
+			<span
+				class="absolute bottom-2 right-2 rounded-full bg-ink/85 px-2 py-0.5 text-2xs font-medium text-paper"
+			>
+				After
+			</span>
+		</div>
+	</div>
+	<figcaption class="border-t border-stone-200 px-4 py-3 text-sm font-medium">
+		{label}
+	</figcaption>
+</figure>

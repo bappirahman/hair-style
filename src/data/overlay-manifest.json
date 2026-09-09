@@ -1,0 +1,587 @@
+[
+	{
+		"id": "afro",
+		"width": 1024,
+		"height": 743,
+		"leftEye": [
+			358.68,
+			713.64
+		],
+		"rightEye": [
+			663.46,
+			713.64
+		]
+	},
+	{
+		"id": "beach-waves",
+		"width": 1024,
+		"height": 942,
+		"leftEye": [
+			343.49,
+			715.07
+		],
+		"rightEye": [
+			697.79,
+			715.07
+		]
+	},
+	{
+		"id": "burst-fade",
+		"width": 1024,
+		"height": 782,
+		"leftEye": [
+			319.41,
+			753.91
+		],
+		"rightEye": [
+			704.59,
+			753.91
+		]
+	},
+	{
+		"id": "buzz-cut",
+		"width": 1024,
+		"height": 687,
+		"leftEye": [
+			309.48,
+			657.64
+		],
+		"rightEye": [
+			682.67,
+			657.64
+		]
+	},
+	{
+		"id": "caesar-cut",
+		"width": 1024,
+		"height": 789,
+		"leftEye": [
+			319.41,
+			718.68
+		],
+		"rightEye": [
+			704.59,
+			718.68
+		]
+	},
+	{
+		"id": "classic-taper",
+		"width": 1024,
+		"height": 773,
+		"leftEye": [
+			319.41,
+			746.86
+		],
+		"rightEye": [
+			704.59,
+			746.86
+		]
+	},
+	{
+		"id": "crew-cut",
+		"width": 1024,
+		"height": 745,
+		"leftEye": [
+			319.41,
+			711.63
+		],
+		"rightEye": [
+			704.59,
+			711.63
+		]
+	},
+	{
+		"id": "curly-fade",
+		"width": 1024,
+		"height": 810,
+		"leftEye": [
+			319.41,
+			770.35
+		],
+		"rightEye": [
+			704.59,
+			770.35
+		]
+	},
+	{
+		"id": "curly-fringe",
+		"width": 1024,
+		"height": 874,
+		"leftEye": [
+			319.41,
+			760.95
+		],
+		"rightEye": [
+			704.59,
+			760.95
+		]
+	},
+	{
+		"id": "curly-top",
+		"width": 1024,
+		"height": 829,
+		"leftEye": [
+			319.41,
+			800.88
+		],
+		"rightEye": [
+			704.59,
+			800.88
+		]
+	},
+	{
+		"id": "curtains",
+		"width": 1024,
+		"height": 884,
+		"leftEye": [
+			322.63,
+			750.47
+		],
+		"rightEye": [
+			706.05,
+			750.47
+		]
+	},
+	{
+		"id": "disconnected-undercut",
+		"width": 1024,
+		"height": 800,
+		"leftEye": [
+			310.86,
+			770.29
+		],
+		"rightEye": [
+			685.71,
+			770.29
+		]
+	},
+	{
+		"id": "drop-fade",
+		"width": 1024,
+		"height": 766,
+		"leftEye": [
+			319.41,
+			742.17
+		],
+		"rightEye": [
+			704.59,
+			742.17
+		]
+	},
+	{
+		"id": "edgar-cut",
+		"width": 1024,
+		"height": 885,
+		"leftEye": [
+			319.41,
+			721.03
+		],
+		"rightEye": [
+			704.59,
+			721.03
+		]
+	},
+	{
+		"id": "flow",
+		"width": 1024,
+		"height": 917,
+		"leftEye": [
+			344.69,
+			673.26
+		],
+		"rightEye": [
+			675.28,
+			673.26
+		]
+	},
+	{
+		"id": "french-crop",
+		"width": 1024,
+		"height": 785,
+		"leftEye": [
+			312.95,
+			720.25
+		],
+		"rightEye": [
+			690.34,
+			720.25
+		]
+	},
+	{
+		"id": "high-fade",
+		"width": 1024,
+		"height": 775,
+		"leftEye": [
+			319.41,
+			746.86
+		],
+		"rightEye": [
+			704.59,
+			746.86
+		]
+	},
+	{
+		"id": "high-taper-fade",
+		"width": 1024,
+		"height": 773,
+		"leftEye": [
+			319.41,
+			746.86
+		],
+		"rightEye": [
+			704.59,
+			746.86
+		]
+	},
+	{
+		"id": "induction-cut",
+		"width": 1024,
+		"height": 698,
+		"leftEye": [
+			319.41,
+			667.01
+		],
+		"rightEye": [
+			704.59,
+			667.01
+		]
+	},
+	{
+		"id": "long-layers",
+		"width": 1024,
+		"height": 1027,
+		"leftEye": [
+			371.42,
+			572.75
+		],
+		"rightEye": [
+			656.05,
+			572.75
+		]
+	},
+	{
+		"id": "low-fade",
+		"width": 1024,
+		"height": 770,
+		"leftEye": [
+			319.41,
+			742.17
+		],
+		"rightEye": [
+			704.59,
+			742.17
+		]
+	},
+	{
+		"id": "low-taper-fade",
+		"width": 1024,
+		"height": 768,
+		"leftEye": [
+			319.41,
+			746.86
+		],
+		"rightEye": [
+			704.59,
+			746.86
+		]
+	},
+	{
+		"id": "man-bun",
+		"width": 1024,
+		"height": 721,
+		"leftEye": [
+			323.61,
+			691.14
+		],
+		"rightEye": [
+			702.7,
+			691.14
+		]
+	},
+	{
+		"id": "medium-swept",
+		"width": 1024,
+		"height": 801,
+		"leftEye": [
+			323.49,
+			770.33
+		],
+		"rightEye": [
+			705.16,
+			770.33
+		]
+	},
+	{
+		"id": "messy-fringe",
+		"width": 1024,
+		"height": 827,
+		"leftEye": [
+			319.41,
+			756.26
+		],
+		"rightEye": [
+			704.59,
+			756.26
+		]
+	},
+	{
+		"id": "mid-fade",
+		"width": 1024,
+		"height": 773,
+		"leftEye": [
+			319.41,
+			746.86
+		],
+		"rightEye": [
+			704.59,
+			746.86
+		]
+	},
+	{
+		"id": "mid-taper-fade",
+		"width": 1024,
+		"height": 773,
+		"leftEye": [
+			319.41,
+			744.51
+		],
+		"rightEye": [
+			704.59,
+			744.51
+		]
+	},
+	{
+		"id": "middle-part",
+		"width": 1024,
+		"height": 990,
+		"leftEye": [
+			333.14,
+			715.46
+		],
+		"rightEye": [
+			699.81,
+			715.46
+		]
+	},
+	{
+		"id": "modern-pompadour",
+		"width": 1024,
+		"height": 895,
+		"leftEye": [
+			319.41,
+			861.94
+		],
+		"rightEye": [
+			704.59,
+			861.94
+		]
+	},
+	{
+		"id": "pompadour",
+		"width": 1024,
+		"height": 932,
+		"leftEye": [
+			319.41,
+			906.57
+		],
+		"rightEye": [
+			704.59,
+			906.57
+		]
+	},
+	{
+		"id": "quiff",
+		"width": 1024,
+		"height": 878,
+		"leftEye": [
+			319.41,
+			850.2
+		],
+		"rightEye": [
+			704.59,
+			850.2
+		]
+	},
+	{
+		"id": "shoulder-length",
+		"width": 1024,
+		"height": 1155,
+		"leftEye": [
+			388.74,
+			534.12
+		],
+		"rightEye": [
+			647.9,
+			534.12
+		]
+	},
+	{
+		"id": "side-part",
+		"width": 1024,
+		"height": 815,
+		"leftEye": [
+			319.41,
+			784.44
+		],
+		"rightEye": [
+			704.59,
+			784.44
+		]
+	},
+	{
+		"id": "side-swept-fringe",
+		"width": 1024,
+		"height": 860,
+		"leftEye": [
+			319.41,
+			756.26
+		],
+		"rightEye": [
+			704.59,
+			756.26
+		]
+	},
+	{
+		"id": "skin-fade",
+		"width": 1024,
+		"height": 773,
+		"leftEye": [
+			319.41,
+			742.17
+		],
+		"rightEye": [
+			704.59,
+			742.17
+		]
+	},
+	{
+		"id": "slick-back",
+		"width": 1024,
+		"height": 788,
+		"leftEye": [
+			317.23,
+			758.09
+		],
+		"rightEye": [
+			699.77,
+			758.09
+		]
+	},
+	{
+		"id": "slicked-back-undercut",
+		"width": 1024,
+		"height": 794,
+		"leftEye": [
+			319.41,
+			760.95
+		],
+		"rightEye": [
+			704.59,
+			760.95
+		]
+	},
+	{
+		"id": "temple-fade",
+		"width": 1024,
+		"height": 780,
+		"leftEye": [
+			319.41,
+			749.21
+		],
+		"rightEye": [
+			704.59,
+			749.21
+		]
+	},
+	{
+		"id": "textured-crop",
+		"width": 1024,
+		"height": 794,
+		"leftEye": [
+			319.41,
+			739.82
+		],
+		"rightEye": [
+			704.59,
+			739.82
+		]
+	},
+	{
+		"id": "textured-quiff",
+		"width": 1024,
+		"height": 871,
+		"leftEye": [
+			319.41,
+			838.46
+		],
+		"rightEye": [
+			704.59,
+			838.46
+		]
+	},
+	{
+		"id": "twist-out",
+		"width": 1024,
+		"height": 775,
+		"leftEye": [
+			346.26,
+			734.75
+		],
+		"rightEye": [
+			692.52,
+			734.75
+		]
+	},
+	{
+		"id": "undercut",
+		"width": 1024,
+		"height": 801,
+		"leftEye": [
+			319.41,
+			772.7
+		],
+		"rightEye": [
+			704.59,
+			772.7
+		]
+	},
+	{
+		"id": "wavy-crop",
+		"width": 1024,
+		"height": 794,
+		"leftEye": [
+			319.41,
+			742.17
+		],
+		"rightEye": [
+			704.59,
+			742.17
+		]
+	},
+	{
+		"id": "wavy-quiff",
+		"width": 1024,
+		"height": 851,
+		"leftEye": [
+			333.66,
+			830.71
+		],
+		"rightEye": [
+			711.05,
+			830.71
+		]
+	},
+	{
+		"id": "wolf-cut",
+		"width": 1024,
+		"height": 1004,
+		"leftEye": [
+			355.66,
+			648.79
+		],
+		"rightEye": [
+			676.15,
+			648.79
+		]
+	}
+]

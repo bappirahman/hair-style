@@ -1,0 +1,32 @@
+---
+/**
+ * Renders the visible trail. The matching BreadcrumbList JSON-LD is built from
+ * the same array by the page, via `breadcrumbSchema`, so the two cannot drift.
+ */
+import type { Crumb } from '../lib/schema.ts';
+
+interface Props {
+	crumbs: Crumb[];
+	class?: string;
+}
+const { crumbs, class: className = '' } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class={`text-2xs ${className}`}>
+	<ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-stone-500">
+		{
+			crumbs.map((crumb, i) => (
+				<li class="flex items-center gap-2">
+					{i > 0 && <span aria-hidden="true" class="text-stone-300">/</span>}
+					{i === crumbs.length - 1 ? (
+						<span aria-current="page" class="text-stone-700">{crumb.name}</span>
+					) : (
+						<a href={crumb.href} class="transition-colors hover:text-copper-600">
+							{crumb.name}
+						</a>
+					)}
+				</li>
+			))
+		}
+	</ol>
+</nav>

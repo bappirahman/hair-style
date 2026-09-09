@@ -1,0 +1,78 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Seo from '../components/Seo.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { breadcrumbSchema, graph, type Crumb } from '../lib/schema.ts';
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Privacy', href: '/privacy' },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Privacy — Your Photo Never Leaves Your Device"
+		description="Photos used in the hairstyle studio are processed entirely in your browser. Nothing is uploaded, stored or transmitted. Here is exactly how to verify that."
+		path="/privacy"
+	>
+		<script type="application/ld+json" is:inline set:html={graph(breadcrumbSchema(crumbs))} />
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<article class="container-prose py-10 pb-16">
+		<h1 class="text-4xl leading-[1.05] sm:text-5xl">Privacy</h1>
+		<div class="editorial mt-8">
+			<blockquote>
+				Your photo is never uploaded. It is read into your browser, composited on your own
+				device, and gone when you close the tab.
+			</blockquote>
+
+			<h2>What happens to your photo</h2>
+			<p>
+				When you choose a photo in the studio, the browser reads the file directly into
+				memory and draws it onto a canvas element. That canvas is where every subsequent
+				operation happens — positioning the hairstyle, adjusting it, generating the
+				before-and-after comparison and producing the file you download.
+			</p>
+			<p>
+				At no point is the image sent anywhere. There is no server that receives it, because
+				there is no server component to this site at all — it is a set of static files.
+			</p>
+
+			<h2>How to verify it</h2>
+			<p>
+				You do not have to take our word for it. Open your browser's developer tools, switch
+				to the Network tab, then upload a photo and apply a hairstyle. You will see requests
+				for the hairstyle overlay images, and nothing outbound carrying your photo.
+			</p>
+			<p>
+				This is the correct way to check any tool that claims local processing, and it takes
+				about fifteen seconds.
+			</p>
+
+			<h2>What is stored</h2>
+			<p>
+				Nothing about your photo. The image is held in memory for the duration of the page
+				and released when you navigate away or close the tab. It is not written to local
+				storage, not cached, and not recoverable afterwards — if you want to keep a result,
+				download it before you leave.
+			</p>
+
+			<h2>Cookies and analytics</h2>
+			<p>
+				This site sets no cookies and runs no third-party analytics, advertising or tracking
+				scripts. Web fonts are served from the site's own domain rather than a font CDN, so
+				loading a page does not contact any external host.
+			</p>
+
+			<h2>Your rights</h2>
+			<p>
+				Because no personal data is collected, transmitted or stored, there is no data to
+				access, correct, export or delete. If that changes, this page changes with it.
+			</p>
+		</div>
+	</article>
+</BaseLayout>

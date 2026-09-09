@@ -1,0 +1,76 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Seo from '../../components/Seo.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { facetCounts } from '../../lib/catalog.ts';
+import { HAIR_TYPE_CONTENT } from '../../lib/facets.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../../lib/schema.ts';
+import { HAIR_TYPES } from '../../lib/taxonomy.ts';
+
+const counts = await facetCounts();
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Hair types', href: '/hair-types' },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Hairstyles by Hair Type — Straight, Wavy, Curly and Coily"
+		description="Straight, wavy, curly, coily, thick and fine hair each behave differently. See which cuts work with your hair type rather than against it."
+		path="/hair-types"
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					HAIR_TYPES.map((t) => ({
+						name: HAIR_TYPE_CONTENT[t].title,
+						href: `/hair-types/${t}`,
+					})),
+					'Hairstyles by hair type',
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<header class="container-page pt-6">
+		<p class="eyebrow">Work with what you have</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">
+			Hairstyles by hair type
+		</h1>
+		<p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+			Most bad haircuts are the result of a cut fighting the hair's natural behaviour. Each
+			type below has its own rules — some of them, like cutting curls dry, matter more than
+			any styling decision you will make afterwards.
+		</p>
+	</header>
+
+	<ul role="list" class="container-page grid gap-4 py-10 pb-16 sm:grid-cols-2 lg:grid-cols-3">
+		{
+			HAIR_TYPES.map((type) => (
+				<li>
+					<a
+						href={`/hair-types/${type}`}
+						class="group flex h-full flex-col rounded-card border border-stone-200 bg-paper p-6 shadow-lift transition-[transform,box-shadow] duration-300 ease-out-soft hover:-translate-y-0.5 hover:shadow-lift-lg"
+					>
+						<h2 class="font-display text-xl transition-colors group-hover:text-copper-700">
+							{HAIR_TYPE_CONTENT[type].title}
+						</h2>
+						<p class="mt-2 flex-1 text-sm leading-relaxed text-stone-600">
+							{HAIR_TYPE_CONTENT[type].tagline}
+						</p>
+						<p class="mt-4 text-2xs text-stone-500">
+							{counts.hairTypes.get(type) ?? 0} matching hairstyles
+						</p>
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</BaseLayout>

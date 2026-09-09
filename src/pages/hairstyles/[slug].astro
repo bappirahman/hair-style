@@ -1,0 +1,277 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import HairstyleGrid from '../../components/HairstyleGrid.astro';
+import Seo from '../../components/Seo.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllHairstyles, getCategories, relatedTo } from '../../lib/catalog.ts';
+import { hairImage } from '../../lib/images.ts';
+import {
+	articleSchema,
+	breadcrumbSchema,
+	faqSchema,
+	graph,
+	howToSchema,
+	type Crumb,
+} from '../../lib/schema.ts';
+import {
+	FACE_SHAPE_LABEL,
+	HAIR_TYPE_LABEL,
+	LENGTH_LABEL,
+	MAINTENANCE_CADENCE,
+	MAINTENANCE_LABEL,
+} from '../../lib/taxonomy.ts';
+
+export async function getStaticPaths() {
+	const styles = await getAllHairstyles();
+	return styles.map((style) => ({ params: { slug: style.id }, props: { style } }));
+}
+
+const { style } = Astro.props;
+const { data } = style;
+const { Content } = await render(style);
+
+const related = await relatedTo(style, 4);
+const categories = await getCategories();
+const primaryCategory = categories.find((c) => c.id === data.category);
+const image = hairImage(data.overlay);
+const path = `/hairstyles/${style.id}`;
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Hairstyles', href: '/hairstyles' },
+	...(primaryCategory
+		? [{ name: primaryCategory.data.name, href: `/categories/${primaryCategory.id}` }]
+		: []),
+	{ name: data.name, href: path },
+];
+
+const specs = [
+	{ label: 'Length', value: LENGTH_LABEL[data.length] },
+	{
+		label: 'Upkeep',
+		value: `${MAINTENANCE_LABEL[data.maintenance]} · ${MAINTENANCE_CADENCE[data.maintenance]}`,
+	},
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title={data.seoTitle}
+		description={data.seoDescription}
+		path={path}
+		image={image.src}
+		imageAlt={data.imageAlt}
+		type="article"
+		updated={data.updated}
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				articleSchema({
+					headline: data.seoTitle,
+					description: data.seoDescription,
+					href: path,
+					image: image.src,
+					updated: data.updated,
+				}),
+				...(data.stylingSteps.length
+					? [
+							howToSchema({
+								name: `How to style a ${data.name.toLowerCase()}`,
+								description: data.summary,
+								steps: data.stylingSteps,
+							}),
+						]
+					: []),
+				...(data.faq.length ? [faqSchema(data.faq)] : []),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6">
+		<Breadcrumbs crumbs={crumbs} />
+	</div>
+
+	<article>
+		<header class="container-page grid gap-8 pt-6 pb-4 lg:grid-cols-[minmax(0,26rem)_1fr] lg:gap-14 lg:pt-10">
+			<div class="overflow-hidden rounded-card border border-stone-200 bg-stone-100">
+				<Image
+					src={image}
+					alt={data.imageAlt}
+					widths={[320, 480, 640, 832]}
+					sizes="(min-width: 1024px) 26rem, 92vw"
+					loading="eager"
+					fetchpriority="high"
+					decoding="sync"
+					class="aspect-4/5 w-full object-cover"
+				/>
+			</div>
+
+			<div class="flex flex-col justify-center">
+				<p class="eyebrow">
+					{primaryCategory ? primaryCategory.data.name : 'Hairstyle'}
+					{data.trending && <span class="text-copper-500"> &middot; Trending</span>}
+				</p>
+				<h1 class="mt-3 text-4xl leading-[1.05] sm:text-5xl">{data.name}</h1>
+				<p class="mt-4 max-w-xl text-lg leading-relaxed text-stone-700">{data.summary}</p>
+
+				<dl class="mt-7 grid gap-x-8 gap-y-4 border-t border-stone-200 pt-6 sm:grid-cols-2">
+					{
+						specs.map((spec) => (
+							<div>
+								<dt class="eyebrow">{spec.label}</dt>
+								<dd class="mt-1.5 text-sm text-stone-700">{spec.value}</dd>
+							</div>
+						))
+					}
+					<div>
+						<dt class="eyebrow">Hair types</dt>
+						<dd class="mt-1.5 flex flex-wrap gap-1.5">
+							{
+								data.hairTypes.map((type) => (
+									<a
+										href={`/hair-types/${type}`}
+										class="rounded-full border border-stone-300 px-2.5 py-1 text-2xs text-stone-700 transition-colors hover:border-copper-400 hover:text-copper-700"
+									>
+										{HAIR_TYPE_LABEL[type]}
+									</a>
+								))
+							}
+						</dd>
+					</div>
+					<div>
+						<dt class="eyebrow">Face shapes</dt>
+						<dd class="mt-1.5 flex flex-wrap gap-1.5">
+							{
+								data.faceShapes.map((shape) => (
+									<a
+										href={`/face-shapes/${shape}`}
+										class="rounded-full border border-stone-300 px-2.5 py-1 text-2xs text-stone-700 transition-colors hover:border-copper-400 hover:text-copper-700"
+									>
+										{FACE_SHAPE_LABEL[shape]}
+									</a>
+								))
+							}
+						</dd>
+					</div>
+				</dl>
+
+				<div class="mt-8 flex flex-wrap gap-3">
+					<a
+						href={`/try?style=${style.id}`}
+						class="rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-copper-600"
+					>
+						Try this hairstyle on your photo
+					</a>
+					<a
+						href={`/categories/${data.category}`}
+						class="rounded-full border border-stone-300 px-6 py-3 text-sm font-medium transition-colors hover:border-ink"
+					>
+						More {primaryCategory?.data.name.toLowerCase() ?? 'styles'}
+					</a>
+				</div>
+			</div>
+		</header>
+
+		<div class="container-prose py-12 sm:py-16">
+			<div class="editorial">
+				<Content />
+			</div>
+
+			<section aria-labelledby="ask" class="mt-14 rounded-card bg-ink p-6 text-ivory sm:p-8">
+				<h2 id="ask" class="eyebrow !text-copper-300">What to ask your barber</h2>
+				<blockquote class="mt-3 font-display text-xl leading-snug sm:text-2xl">
+					&ldquo;{data.barberAsk}&rdquo;
+				</blockquote>
+				<p class="mt-4 text-sm leading-relaxed text-stone-300">{data.maintenanceNote}</p>
+			</section>
+
+			{
+				data.stylingSteps.length > 0 && (
+					<section aria-labelledby="styling" class="mt-14">
+						<h2 id="styling" class="font-display text-2xl">
+							How to style it
+						</h2>
+						<ol class="mt-6 space-y-5">
+							{data.stylingSteps.map((step, i) => (
+								<li class="flex gap-4">
+									<span
+										aria-hidden="true"
+										class="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-copper-300 text-2xs font-semibold text-copper-700"
+									>
+										{i + 1}
+									</span>
+									<div>
+										<h3 class="font-display text-base leading-snug">{step.title}</h3>
+										<p class="mt-1 text-[0.95rem] leading-relaxed text-stone-600">
+											{step.detail}
+										</p>
+									</div>
+								</li>
+							))}
+						</ol>
+						{data.products.length > 0 && (
+							<p class="mt-6 text-sm text-stone-500">
+								<span class="font-medium text-stone-700">Worth having:</span>{' '}
+								{data.products.join(', ')}.
+							</p>
+						)}
+					</section>
+				)
+			}
+
+			{
+				data.faq.length > 0 && (
+					<section aria-labelledby="faq" class="mt-14">
+						<h2 id="faq" class="font-display text-2xl">
+							Common questions
+						</h2>
+						<div class="mt-5 divide-y divide-stone-200 border-y border-stone-200">
+							{data.faq.map((item) => (
+								<details class="group py-4">
+									<summary class="flex cursor-pointer list-none items-start justify-between gap-4 font-medium">
+										<span>{item.q}</span>
+										<span
+											aria-hidden="true"
+											class="mt-1 shrink-0 text-copper-600 transition-transform group-open:rotate-45"
+										>
+											+
+										</span>
+									</summary>
+									<p class="mt-3 text-[0.95rem] leading-relaxed text-stone-600">{item.a}</p>
+								</details>
+							))}
+						</div>
+					</section>
+				)
+			}
+
+			<div class="mt-14 rounded-card border border-copper-200 bg-copper-50 p-6 text-center sm:p-8">
+				<h2 class="font-display text-2xl">See it on your own face</h2>
+				<p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-600">
+					Upload a photo, click your two eyes, and the {data.name.toLowerCase()} is fitted
+					to your head automatically. Nothing is uploaded anywhere.
+				</p>
+				<a
+					href={`/try?style=${style.id}`}
+					class="mt-5 inline-flex rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-copper-600"
+				>
+					Try the {data.name.toLowerCase()}
+				</a>
+			</div>
+		</div>
+	</article>
+
+	<section aria-labelledby="related" class="container-page pb-16">
+		<h2 id="related" class="font-display text-2xl">Similar hairstyles</h2>
+		<div class="mt-6">
+			<HairstyleGrid styles={related} />
+		</div>
+	</section>
+</BaseLayout>

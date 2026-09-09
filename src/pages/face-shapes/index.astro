@@ -1,0 +1,76 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Seo from '../../components/Seo.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { facetCounts } from '../../lib/catalog.ts';
+import { FACE_SHAPE_CONTENT } from '../../lib/facets.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../../lib/schema.ts';
+import { FACE_SHAPES } from '../../lib/taxonomy.ts';
+
+const counts = await facetCounts();
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Face shapes', href: '/face-shapes' },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Hairstyles by Face Shape — Find What Suits Yours"
+		description="Oval, round, square, heart, diamond and oblong faces each suit different cuts. Identify your face shape and see the hairstyles that flatter it."
+		path="/face-shapes"
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					FACE_SHAPES.map((s) => ({
+						name: FACE_SHAPE_CONTENT[s].title,
+						href: `/face-shapes/${s}`,
+					})),
+					'Hairstyles by face shape',
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<header class="container-page pt-6">
+		<p class="eyebrow">Find your shape</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">
+			Hairstyles by face shape
+		</h1>
+		<p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+			Face shape is the most useful single filter for narrowing 45 hairstyles down to a
+			shortlist. Find the description that matches yours, then work from the cuts listed
+			underneath it.
+		</p>
+	</header>
+
+	<ul role="list" class="container-page grid gap-4 py-10 pb-16 sm:grid-cols-2 lg:grid-cols-3">
+		{
+			FACE_SHAPES.map((shape) => (
+				<li>
+					<a
+						href={`/face-shapes/${shape}`}
+						class="group flex h-full flex-col rounded-card border border-stone-200 bg-paper p-6 shadow-lift transition-[transform,box-shadow] duration-300 ease-out-soft hover:-translate-y-0.5 hover:shadow-lift-lg"
+					>
+						<h2 class="font-display text-xl transition-colors group-hover:text-copper-700">
+							{FACE_SHAPE_CONTENT[shape].title}
+						</h2>
+						<p class="mt-2 flex-1 text-sm leading-relaxed text-stone-600">
+							{FACE_SHAPE_CONTENT[shape].tagline}
+						</p>
+						<p class="mt-4 text-2xs text-stone-500">
+							{counts.faceShapes.get(shape) ?? 0} matching hairstyles
+						</p>
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</BaseLayout>

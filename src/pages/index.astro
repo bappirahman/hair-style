@@ -1,11 +1,380 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BeforeAfter from '../components/BeforeAfter.astro';
+import HairstyleGrid from '../components/HairstyleGrid.astro';
+import Section from '../components/Section.astro';
+import Seo from '../components/Seo.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { facetCounts, getCategories, popular, trending } from '../lib/catalog.ts';
+import { hairImage } from '../lib/images.ts';
+import {
+	faqSchema,
+	graph,
+	organizationSchema,
+	websiteSchema,
+} from '../lib/schema.ts';
+import { FACE_SHAPES, FACE_SHAPE_LABEL } from '../lib/taxonomy.ts';
+
+const popularStyles = await popular(8);
+const trendingStyles = await trending(4);
+const categories = await getCategories();
+const counts = await facetCounts();
+
+const hero = hairImage('mid-fade');
+
+const steps = [
+	{
+		title: 'Upload your photo',
+		detail:
+			'A straight-on photo with both eyes visible works best. It is read straight into your browser — nothing is uploaded anywhere.',
+	},
+	{
+		title: 'Click your two eyes',
+		detail:
+			'Two clicks fix the scale, angle and position all at once, so the hairstyle lands where it should without any dragging.',
+	},
+	{
+		title: 'Try every hairstyle',
+		detail:
+			'Switch between all 45 cuts without re-aligning. Compare against the original, adjust the fit, and download the result.',
+	},
+];
+
+const faq = [
+	{
+		q: 'Do I need to upload my photo anywhere?',
+		a: 'No. The photo is read directly into your browser and composited on your own device. There is no server involved and no request that carries your image — you can confirm this in your browser’s network panel while you use it.',
+	},
+	{
+		q: 'Is this AI-generated?',
+		a: 'No. Each hairstyle is a drawn asset with recorded eye positions. When you click your own eyes, the browser solves the geometric transform between the two and composites the layers. There is no model, no generation and no external service.',
+	},
+	{
+		q: 'How realistic are the previews?',
+		a: 'They are illustrations rather than photographs. A preview shows you the silhouette, the volume and where the hairline sits, which is enough to rule shapes in and out. It will not show you what your own hair looks like in that cut.',
+	},
+	{
+		q: 'What kind of photo works best?',
+		a: 'Facing the camera, head upright, both eyes clearly visible, and hair pushed back off the forehead if possible. Strong side lighting and heavy angles make the fit harder to judge.',
+	},
+	{
+		q: 'How many hairstyles are there?',
+		a: `${counts.total} at the moment, across fades, tapers, buzz cuts, crops, undercuts, pompadours, quiffs, slick backs, curtains, and curly, wavy, medium and long styles.`,
+	},
+	{
+		q: 'Can I use my own hairstyle reference image?',
+		a: 'Yes. The studio has a second tab where you can load your own hairstyle image, cut out its background with a threshold tool, and position it over your photo manually.',
+	},
+];
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Find Your Perfect Hairstyle — Try 45 Cuts on Your Own Photo"
+		description="Upload a photo, pick a hairstyle and see the result instantly. 45 men's cuts with honest guidance on face shapes, hair types and upkeep. Nothing leaves your browser."
+		path="/"
+		image="/og-default.png"
+		imageAlt="Three illustrated hairstyle previews"
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(organizationSchema(), websiteSchema(), faqSchema(faq))}
+		/>
+	</Seo>
+
+	<!-- Hero -->
+	<section class="container-page grid items-center gap-10 pt-10 pb-6 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:pt-16">
+		<div>
+			<p class="eyebrow">Hairstyle discovery &amp; virtual preview</p>
+			<h1 class="mt-4 text-[2.75rem] leading-[0.98] tracking-[-0.02em] sm:text-6xl lg:text-[4.25rem]">
+				Find your perfect hairstyle
+			</h1>
+			<p class="mt-6 max-w-xl text-lg leading-relaxed text-stone-600">
+				Upload a photo, choose from {counts.total} hairstyles and see the cut on your own face
+				before you sit in the chair. Every preview is composited in your browser — your photo
+				is never uploaded.
+			</p>
+			<div class="mt-9 flex flex-wrap gap-3">
+				<a
+					href="/try"
+					class="rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-paper transition-colors hover:bg-copper-600"
+				>
+					Try a hairstyle
+				</a>
+				<a
+					href="/hairstyles"
+					class="rounded-full border border-stone-400 px-7 py-3.5 text-sm font-medium transition-colors hover:border-ink hover:bg-paper"
+				>
+					Explore hairstyles
+				</a>
+			</div>
+			<dl class="mt-10 flex flex-wrap gap-x-9 gap-y-4 border-t border-stone-200 pt-6">
+				{
+					[
+						[counts.total, 'hairstyles'],
+						[categories.length, 'categories'],
+						[FACE_SHAPES.length, 'face shapes covered'],
+					].map(([value, label]) => (
+						<div>
+							<dt class="sr-only">{label}</dt>
+							<dd>
+								<span class="font-display text-2xl">{value}</span>
+								<span class="ml-1.5 text-sm text-stone-500">{label}</span>
+							</dd>
+						</div>
+					))
+				}
+			</dl>
+		</div>
+
+		<div class="relative mx-auto w-full max-w-sm lg:max-w-none">
+			<div class="overflow-hidden rounded-card border border-stone-200 bg-stone-100 shadow-lift-lg">
+				<Image
+					src={hero}
+					alt="An illustrated preview of a mid fade haircut shown on a front-facing head"
+					widths={[400, 600, 800]}
+					sizes="(min-width: 1024px) 30rem, 24rem"
+					loading="eager"
+					fetchpriority="high"
+					decoding="sync"
+					class="aspect-4/5 w-full object-cover"
+				/>
+			</div>
+			<p
+				class="absolute -bottom-4 left-4 rounded-full border border-stone-200 bg-paper px-4 py-2 text-2xs shadow-lift"
+			>
+				Mid fade &middot; previewed in-browser
+			</p>
+		</div>
+	</section>
+
+	<!-- How it works -->
+	<Section
+		eyebrow="How it works"
+		title="Three steps, about a minute"
+		lede="No account, no upload, no waiting on a server. The whole thing runs on your own device."
+		id="how-it-works"
+	>
+		<ol class="grid gap-6 sm:grid-cols-3">
+			{
+				steps.map((step, i) => (
+					<li class="rounded-card border border-stone-200 bg-paper p-6 shadow-lift">
+						<span
+							aria-hidden="true"
+							class="grid h-8 w-8 place-items-center rounded-full bg-ink text-sm font-medium text-paper"
+						>
+							{i + 1}
+						</span>
+						<h3 class="mt-4 font-display text-lg leading-snug">{step.title}</h3>
+						<p class="mt-2 text-sm leading-relaxed text-stone-600">{step.detail}</p>
+					</li>
+				))
+			}
+		</ol>
+	</Section>
+
+	<!-- Popular -->
+	<Section
+		eyebrow="Most requested"
+		title="Popular hairstyles"
+		lede="The cuts that walk through barbershop doors most often. Browse them without uploading anything."
+		href="/popular"
+		linkLabel="See all popular"
+	>
+		<HairstyleGrid styles={popularStyles} />
+	</Section>
+
+	<!-- Before and after -->
+	<Section
+		eyebrow="Before and after"
+		title="See the difference a shape makes"
+		lede="The same head, three different cuts. Fade height and fringe length change proportions more than most people expect."
+	>
+		<div class="grid gap-5 sm:grid-cols-3">
+			<BeforeAfter
+				overlay="pompadour"
+				tone="fair"
+				label="Pompadour"
+				alt="A pompadour preview showing swept-back volume above the forehead"
+			/>
+			<BeforeAfter
+				overlay="french-crop"
+				tone="olive"
+				label="French crop"
+				alt="A French crop preview showing a blunt fringe pushed forward over the forehead"
+			/>
+			<BeforeAfter
+				overlay="curly-fade"
+				tone="deep"
+				label="Curly fade"
+				alt="A curly fade preview showing defined curls above closely faded sides"
+			/>
+		</div>
+	</Section>
+
+	<!-- Categories -->
+	<Section
+		eyebrow="Browse by shape"
+		title="Hairstyle categories"
+		lede="Fifteen families of cut, each with its own logic and its own maintenance cost."
+		href="/categories"
+	>
+		<ul role="list" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+			{
+				categories.map((category) => (
+					<li>
+						<a
+							href={`/categories/${category.id}`}
+							class="group flex h-full items-baseline justify-between gap-4 rounded-card border border-stone-200 bg-paper px-5 py-4 transition-colors hover:border-ink"
+						>
+							<span class="font-display text-lg transition-colors group-hover:text-copper-700">
+								{category.data.name}
+							</span>
+							<span class="shrink-0 text-2xs text-stone-500">
+								{counts.categories.get(category.id as never) ?? 0}
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</Section>
+
+	<!-- Trending -->
+	<Section
+		eyebrow="Gaining ground"
+		title="Trending right now"
+		lede="Cuts that have moved from niche to common request over the last couple of years."
+		href="/trending"
+		linkLabel="See all trending"
+	>
+		<HairstyleGrid styles={trendingStyles} />
+	</Section>
+
+	<!-- Face shapes -->
+	<Section
+		eyebrow="Narrow it down"
+		title="Start from your face shape"
+		lede="The single most useful filter for cutting 45 hairstyles down to a shortlist worth trying."
+		href="/face-shapes"
+	>
+		<ul role="list" class="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+			{
+				FACE_SHAPES.map((shape) => (
+					<li>
+						<a
+							href={`/face-shapes/${shape}`}
+							class="flex h-full flex-col items-center gap-1 rounded-card border border-stone-200 bg-paper px-3 py-5 text-center transition-colors hover:border-ink"
+						>
+							<span class="font-display text-base">{FACE_SHAPE_LABEL[shape]}</span>
+							<span class="text-2xs text-stone-500">
+								{counts.faceShapes.get(shape) ?? 0} styles
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</Section>
+
+	<!-- SEO prose -->
+	<section class="container-prose py-6 sm:py-10">
+		<div class="editorial border-t border-stone-200 pt-12">
+			<h2>Choosing a hairstyle that actually works</h2>
+			<p>
+				Most hairstyle advice fails in the same way: it tells you what looks good without
+				telling you what it costs. A high skin fade is genuinely striking, and it looks its
+				best for about a week. A low taper fade is far quieter and holds its shape for six.
+				Both are good haircuts; only one of them fits a monthly barber visit.
+			</p>
+			<p>
+				That trade-off — contrast against longevity — runs through nearly every decision on
+				this site. The more dramatic the shape, the faster it degrades, because the thing
+				that makes it dramatic is exactly the thing that regrows first. Every hairstyle page
+				here states its real cycle rather than an optimistic one.
+			</p>
+
+			<h3>Face shape matters, but less than people think</h3>
+			<p>
+				Face shape is a useful filter, not a rule. Two adjustments account for most of it:
+				<strong>round faces want height on top and width removed at the sides</strong>, and
+				<strong>long faces want the opposite</strong> — a fringe to shorten the forehead and
+				weight kept at the sides. Square and oval faces have the widest latitude, and heart
+				and diamond shapes mainly benefit from managing the width at the top of the face.
+			</p>
+			<p>
+				Beyond that, hair type constrains you more than face shape does. Curly hair cannot be
+				slicked back convincingly. Fine hair cannot hold a pompadour. Straight hair cannot
+				produce a wolf cut's texture without a great deal of help. Choosing a cut your hair
+				can actually do is the single highest-return decision available.
+			</p>
+
+			<h3>Why previewing helps</h3>
+			<p>
+				A photograph of someone else with a good haircut tells you very little about how it
+				will sit on your head. Their hairline is not yours, their face is a different length,
+				and the cut was styled by the person who cut it. Putting the shape on your own photo
+				removes most of that guesswork — not by predicting your hair, but by showing you how
+				a fade height, a fringe line or a volume change alters your own proportions.
+			</p>
+			<p>
+				Start with the <a href="/popular">most requested cuts</a>, narrow by
+				<a href="/face-shapes">face shape</a> or <a href="/hair-types">hair type</a>, then
+				take a shortlist into the <a href="/try">studio</a> and compare them side by side.
+			</p>
+		</div>
+	</section>
+
+	<!-- FAQ -->
+	<Section eyebrow="Questions" title="Frequently asked" class="!pt-4">
+		<div class="mx-auto max-w-3xl divide-y divide-stone-200 border-y border-stone-200">
+			{
+				faq.map((item) => (
+					<details class="group py-4">
+						<summary class="flex cursor-pointer list-none items-start justify-between gap-4 font-medium">
+							<span>{item.q}</span>
+							<span
+								aria-hidden="true"
+								class="mt-1 shrink-0 text-copper-600 transition-transform group-open:rotate-45"
+							>
+								+
+							</span>
+						</summary>
+						<p class="mt-3 text-[0.95rem] leading-relaxed text-stone-600">{item.a}</p>
+					</details>
+				))
+			}
+		</div>
+	</Section>
+
+	<!-- Closing CTA -->
+	<section class="container-page pb-20">
+		<div class="rounded-card bg-ink px-6 py-14 text-center text-ivory sm:px-10">
+			<p class="eyebrow !text-copper-300">Ready when you are</p>
+			<h2 class="mx-auto mt-3 max-w-2xl text-3xl leading-[1.05] sm:text-5xl">
+				Try it on your own face first
+			</h2>
+			<p class="mx-auto mt-4 max-w-lg text-base leading-relaxed text-stone-300">
+				One photo, two clicks, and {counts.total} hairstyles to move through. Nothing is
+				uploaded and nothing is stored.
+			</p>
+			<div class="mt-8 flex flex-wrap justify-center gap-3">
+				<a
+					href="/try"
+					class="rounded-full bg-ivory px-7 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-copper-400 hover:text-paper"
+				>
+					Try a hairstyle
+				</a>
+				<a
+					href="/hairstyles"
+					class="rounded-full border border-stone-600 px-7 py-3.5 text-sm font-medium text-ivory transition-colors hover:border-ivory"
+				>
+					Explore hairstyles
+				</a>
+			</div>
+		</div>
+	</section>
+</BaseLayout>

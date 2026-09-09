@@ -1,0 +1,264 @@
+@import 'tailwindcss';
+
+/*
+ * Self-hosted from a stable path (see scripts/build-assets.ts) so both faces
+ * can be preloaded by the layout. Latin only — the site is English.
+ */
+@font-face {
+	font-family: 'Inter Variable';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 100 900;
+	src: url('/fonts/inter-latin.woff2') format('woff2-variations');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+		U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+	font-family: 'Fraunces Variable';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 100 900;
+	src: url('/fonts/fraunces-latin.woff2') format('woff2-variations');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+		U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Metric-matched fallbacks. Measured against the real faces: Fraunces sets
+ * 4.71% wider than Georgia and Inter 6.66% wider than Arial at the same size,
+ * so `size-adjust` makes the fallback occupy the same space and the swap stops
+ * reflowing the page. This is what takes CLS on the catalog to zero.
+ */
+@font-face {
+	font-family: 'Fraunces Fallback';
+	src: local('Georgia'), local('Times New Roman'), local('Times');
+	size-adjust: 104.71%;
+	line-gap-override: 0%;
+	ascent-override: 92%;
+	descent-override: 24%;
+}
+
+@font-face {
+	font-family: 'Inter Fallback';
+	src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+	size-adjust: 106.66%;
+	line-gap-override: 0%;
+	ascent-override: 91%;
+	descent-override: 23%;
+}
+
+@theme {
+	/* ---- Palette ------------------------------------------------------- */
+	--color-ink: #0b0b0c;
+	--color-ink-soft: #17171a;
+	--color-ink-muted: #3a3a40;
+
+	--color-ivory: #faf7f2;
+	--color-paper: #ffffff;
+
+	--color-stone-50: #f7f5f1;
+	--color-stone-100: #efece5;
+	--color-stone-200: #e2ddd3;
+	--color-stone-300: #cdc6b9;
+	--color-stone-400: #a79f90;
+	--color-stone-500: #837b6d;
+	--color-stone-600: #635c51;
+	--color-stone-700: #4a453d;
+	--color-stone-800: #2f2c27;
+
+	--color-copper-50: #fdf5f1;
+	--color-copper-100: #f9e5db;
+	--color-copper-200: #f0c6b2;
+	--color-copper-300: #e0a183;
+	--color-copper-400: #d0805c;
+	--color-copper-500: #c0663c;
+	--color-copper-600: #a5502c;
+	--color-copper-700: #833e22;
+
+	/* ---- Type ---------------------------------------------------------- */
+	--font-sans: 'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui,
+		-apple-system, 'Segoe UI', sans-serif;
+	--font-display: 'Fraunces Variable', 'Fraunces Fallback', ui-serif, Georgia,
+		'Times New Roman', serif;
+
+	--text-2xs: 0.6875rem;
+	--text-2xs--line-height: 1rem;
+
+	/* ---- Motion & shape ------------------------------------------------ */
+	--radius-card: 0.875rem;
+	--ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+	--shadow-lift: 0 1px 2px rgb(11 11 12 / 0.04),
+		0 8px 24px -12px rgb(11 11 12 / 0.14);
+	--shadow-lift-lg: 0 2px 4px rgb(11 11 12 / 0.05),
+		0 24px 48px -20px rgb(11 11 12 / 0.22);
+}
+
+@layer base {
+	:root {
+		color-scheme: light;
+		--gutter: 1.25rem;
+	}
+
+	@media (min-width: 48rem) {
+		:root {
+			--gutter: 2rem;
+		}
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		scroll-behavior: smooth;
+		text-rendering: optimizeLegibility;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
+
+	body {
+		background-color: var(--color-ivory);
+		color: var(--color-ink);
+		font-family: var(--font-sans);
+		font-synthesis-weight: none;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-display);
+		font-weight: 500;
+		letter-spacing: -0.015em;
+		font-variation-settings: 'SOFT' 0, 'WONK' 0;
+		text-wrap: balance;
+	}
+
+	p {
+		text-wrap: pretty;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-copper-500);
+		outline-offset: 3px;
+		border-radius: 2px;
+	}
+
+	::selection {
+		background: var(--color-copper-200);
+		color: var(--color-ink);
+	}
+
+	img,
+	svg,
+	video,
+	canvas {
+		display: block;
+		max-width: 100%;
+	}
+}
+
+@utility container-page {
+	width: 100%;
+	max-width: 78rem;
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+@utility container-prose {
+	width: 100%;
+	max-width: 44rem;
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+/* Eyebrow / kicker label used above section headings. */
+@utility eyebrow {
+	font-size: var(--text-2xs);
+	line-height: 1;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--color-copper-600);
+}
+
+/* Editorial body copy inside hairstyle articles. */
+@utility editorial {
+	color: var(--color-stone-800);
+	font-size: 1.0625rem;
+	line-height: 1.75;
+
+	& > * + * {
+		margin-block-start: 1.15em;
+	}
+
+	& h2 {
+		margin-block-start: 2.25em;
+		margin-block-end: 0.6em;
+		font-size: 1.5rem;
+		line-height: 1.25;
+		color: var(--color-ink);
+	}
+
+	& h3 {
+		margin-block-start: 1.75em;
+		margin-block-end: 0.5em;
+		font-size: 1.175rem;
+		line-height: 1.35;
+		color: var(--color-ink);
+	}
+
+	& ul,
+	& ol {
+		padding-inline-start: 1.35em;
+	}
+
+	& ul {
+		list-style: disc;
+	}
+	& ol {
+		list-style: decimal;
+	}
+
+	& li + li {
+		margin-block-start: 0.4em;
+	}
+
+	& strong {
+		font-weight: 600;
+		color: var(--color-ink);
+	}
+
+	& a {
+		color: var(--color-copper-700);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		text-decoration-thickness: 1px;
+	}
+
+	& a:hover {
+		color: var(--color-copper-500);
+	}
+
+	& blockquote {
+		border-inline-start: 2px solid var(--color-copper-400);
+		padding-inline-start: 1.15em;
+		font-family: var(--font-display);
+		font-size: 1.2rem;
+		line-height: 1.5;
+		color: var(--color-ink-soft);
+	}
+}

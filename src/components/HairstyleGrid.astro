@@ -1,0 +1,27 @@
+---
+import type { Hairstyle } from '../lib/catalog.ts';
+import HairstyleCard from './HairstyleCard.astro';
+
+interface Props {
+	styles: Hairstyle[];
+	/** Number of leading cards rendered eagerly, for LCP above the fold. */
+	eagerCount?: number;
+	id?: string;
+	class?: string;
+}
+const { styles, eagerCount = 0, id, class: className = '' } = Astro.props;
+---
+
+<ul
+	id={id}
+	role="list"
+	class={`grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 ${className}`}
+>
+	{
+		styles.map((style, i) => (
+			<li class="contents">
+				<HairstyleCard style={style} eager={i < eagerCount} />
+			</li>
+		))
+	}
+</ul>

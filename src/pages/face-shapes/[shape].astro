@@ -1,0 +1,93 @@
+---
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import HairstyleGrid from '../../components/HairstyleGrid.astro';
+import Seo from '../../components/Seo.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { byFaceShape } from '../../lib/catalog.ts';
+import { FACE_SHAPE_CONTENT } from '../../lib/facets.ts';
+import { hairImage } from '../../lib/images.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../../lib/schema.ts';
+import { FACE_SHAPES, type FaceShape } from '../../lib/taxonomy.ts';
+
+export function getStaticPaths() {
+	return FACE_SHAPES.map((shape) => ({ params: { shape } }));
+}
+
+const shape = Astro.params.shape as FaceShape;
+const facet = FACE_SHAPE_CONTENT[shape];
+const styles = await byFaceShape(shape);
+const path = `/face-shapes/${shape}`;
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Face shapes', href: '/face-shapes' },
+	{ name: facet.title, href: path },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title={facet.seoTitle}
+		description={facet.seoDescription}
+		path={path}
+		image={styles[0] ? hairImage(styles[0].data.overlay).src : undefined}
+		imageAlt={styles[0]?.data.imageAlt}
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					styles.map((s) => ({
+						name: s.data.name,
+						href: `/hairstyles/${s.id}`,
+						image: hairImage(s.data.overlay).src,
+					})),
+					facet.seoTitle,
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6">
+		<Breadcrumbs crumbs={crumbs} />
+	</div>
+
+	<header class="container-page pt-6">
+		<p class="eyebrow">Face shape</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">
+			Best hairstyles for {facet.title.toLowerCase()}s
+		</h1>
+		<p class="mt-4 max-w-2xl text-lg leading-relaxed text-stone-600">{facet.tagline}</p>
+	</header>
+
+	<div class="container-page grid gap-10 py-10 lg:grid-cols-[1fr_20rem]">
+		<div class="editorial">
+			{facet.body.map((paragraph) => <p>{paragraph}</p>)}
+		</div>
+		<aside class="rounded-card border border-stone-200 bg-stone-50 p-6 lg:sticky lg:top-24 lg:self-start">
+			<h2 class="eyebrow">The short version</h2>
+			<ul class="mt-4 space-y-3 text-sm leading-relaxed text-stone-700">
+				{
+					facet.rules.map((rule) => (
+						<li class="flex gap-2.5">
+							<span aria-hidden="true" class="mt-2 h-1 w-1 shrink-0 rounded-full bg-copper-500" />
+							<span>{rule}</span>
+						</li>
+					))
+				}
+			</ul>
+		</aside>
+	</div>
+
+	<section aria-labelledby="matches" class="container-page pb-16">
+		<h2 id="matches" class="font-display text-2xl">
+			{styles.length} hairstyles that suit {facet.title.toLowerCase()}s
+		</h2>
+		<div class="mt-6">
+			<HairstyleGrid styles={styles} />
+		</div>
+	</section>
+</BaseLayout>

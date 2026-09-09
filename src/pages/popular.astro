@@ -1,0 +1,58 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import HairstyleGrid from '../components/HairstyleGrid.astro';
+import Seo from '../components/Seo.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { popular } from '../lib/catalog.ts';
+import { hairImage } from '../lib/images.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../lib/schema.ts';
+
+const styles = await popular();
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Popular hairstyles', href: '/popular' },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Popular Hairstyles — The Most Requested Cuts"
+		description="The hairstyles people actually ask for: low taper fades, mid fades, French crops, buzz cuts, quiffs, curtains and more. Try any of them on your photo."
+		path="/popular"
+		image={hairImage(styles[0]!.data.overlay).src}
+		imageAlt={styles[0]!.data.imageAlt}
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					styles.map((s) => ({
+						name: s.data.name,
+						href: `/hairstyles/${s.id}`,
+						image: hairImage(s.data.overlay).src,
+					})),
+					'Popular hairstyles',
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<header class="container-page pt-6">
+		<p class="eyebrow">Most requested</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">Popular hairstyles</h1>
+		<p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+			These are the cuts that walk through barbershop doors most often, ordered roughly by how
+			frequently they are asked for. The low taper fade tops the list for a reason: it is the
+			smallest change that reliably makes hair look cut.
+		</p>
+	</header>
+
+	<section aria-label="Popular hairstyles" class="container-page py-10 pb-16">
+		<HairstyleGrid styles={styles} eagerCount={4} />
+	</section>
+</BaseLayout>

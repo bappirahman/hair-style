@@ -1,0 +1,58 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import HairstyleGrid from '../components/HairstyleGrid.astro';
+import Seo from '../components/Seo.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { trending } from '../lib/catalog.ts';
+import { hairImage } from '../lib/images.ts';
+import { breadcrumbSchema, graph, itemListSchema, type Crumb } from '../lib/schema.ts';
+
+const styles = await trending();
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Trending hairstyles', href: '/trending' },
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Trending Hairstyles — What People Are Asking For Now"
+		description="Burst fades, Edgar cuts, wolf cuts, middle parts and textured quiffs. The cuts gaining ground right now, with honest notes on what each one costs to maintain."
+		path="/trending"
+		image={hairImage(styles[0]!.data.overlay).src}
+		imageAlt={styles[0]!.data.imageAlt}
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				itemListSchema(
+					styles.map((s) => ({
+						name: s.data.name,
+						href: `/hairstyles/${s.id}`,
+						image: hairImage(s.data.overlay).src,
+					})),
+					'Trending hairstyles',
+				),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<header class="container-page pt-6">
+		<p class="eyebrow">Gaining ground</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">Trending hairstyles</h1>
+		<p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+			Cuts that have moved from niche to common request over the last couple of years. Several
+			of them are genuinely demanding to maintain — each page says so plainly rather than
+			leaving you to find out at week three.
+		</p>
+	</header>
+
+	<section aria-label="Trending hairstyles" class="container-page py-10 pb-16">
+		<HairstyleGrid styles={styles} eagerCount={4} />
+	</section>
+</BaseLayout>

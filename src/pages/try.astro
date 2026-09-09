@@ -1,0 +1,183 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Seo from '../components/Seo.astro';
+import Studio from '../components/studio/Studio.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllHairstyles, popular } from '../lib/catalog.ts';
+import {
+	breadcrumbSchema,
+	faqSchema,
+	graph,
+	howToSchema,
+	type Crumb,
+} from '../lib/schema.ts';
+
+const styles = await getAllHairstyles();
+const initial = (await popular(1))[0]!;
+
+const crumbs: Crumb[] = [
+	{ name: 'Home', href: '/' },
+	{ name: 'Try a hairstyle', href: '/try' },
+];
+
+const steps = [
+	{
+		title: 'Add your photo',
+		detail:
+			'Choose or drop a front-facing photo. It is read straight into this page and never uploaded.',
+	},
+	{
+		title: 'Click your two eyes',
+		detail:
+			'Click the centre of each eye in turn. Those two points fix the hairstyle’s scale, angle and position in one step.',
+	},
+	{
+		title: 'Adjust and compare',
+		detail:
+			'Drag to reposition, scroll to resize, recolour it, then pull the before/after slider to check it against the original.',
+	},
+	{
+		title: 'Download the result',
+		detail:
+			'The file you download is the same composite you are looking at, rendered at your photo’s full resolution.',
+	},
+];
+
+const faq = [
+	{
+		q: 'Is my photo uploaded anywhere?',
+		a: 'No. It is read into a canvas element in this page and stays there. Open your browser’s network panel while you use the studio and you will see requests for hairstyle overlays and nothing else.',
+	},
+	{
+		q: 'Why do I have to click my eyes?',
+		a: 'Because two points are all the information needed. The distance between your eyes sets the scale, the angle between them sets the rotation, and their position sets the placement. Every hairstyle records where the eyes sit relative to it, so one pair of clicks aligns all 45.',
+	},
+	{
+		q: 'Do I have to re-align when I switch hairstyles?',
+		a: 'No. The alignment belongs to your photo, not to the hairstyle, so you can move through the whole catalogue with the fit intact.',
+	},
+	{
+		q: 'What makes a good photo?',
+		a: 'Facing the camera, head upright and level, both eyes clearly visible, even lighting, and hair pushed back off the forehead if you can. Three-quarter angles and tilted heads will fit less convincingly because the hairstyle assets are drawn front-on.',
+	},
+	{
+		q: 'Why does it look illustrated rather than photographic?',
+		a: 'Because it is. Every hairstyle here is drawn rather than photographed, and nothing is generated. A preview is for judging shape, volume and hairline position — it is not a photorealistic prediction of your own hair.',
+	},
+];
+---
+
+<BaseLayout>
+	<Seo
+		slot="head"
+		title="Try a Hairstyle on Your Photo — Free Virtual Preview"
+		description="Upload a photo, click your two eyes and see any of 45 hairstyles fitted to your head. Compare against the original and download the result. Nothing leaves your browser."
+		path="/try"
+		image="/og-default.png"
+		imageAlt="Hairstyle previews composited on illustrated heads"
+	>
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={graph(
+				breadcrumbSchema(crumbs),
+				howToSchema({
+					name: 'How to preview a hairstyle on your own photo',
+					description:
+						'Upload a photo, mark your eye positions, and composite any hairstyle onto it in the browser.',
+					steps,
+				}),
+				faqSchema(faq),
+			)}
+		/>
+	</Seo>
+
+	<div class="container-page pt-6"><Breadcrumbs crumbs={crumbs} /></div>
+
+	<header class="container-page pt-6 pb-8">
+		<p class="eyebrow">The studio</p>
+		<h1 class="mt-2.5 max-w-3xl text-4xl leading-[1.05] sm:text-5xl">
+			Try a hairstyle on your own photo
+		</h1>
+		<p class="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
+			Add a photo, click your two eyes, and any of the {styles.length} hairstyles will be fitted
+			to your head automatically. Switch between them freely, adjust the fit, recolour the hair
+			and download the result. Everything runs on your device — your photo is never uploaded.
+		</p>
+	</header>
+
+	<Studio styles={styles} initialStyle={initial.id} />
+
+	<section aria-labelledby="studio-steps" class="container-page py-16">
+		<h2 id="studio-steps" class="font-display text-3xl">How the studio works</h2>
+		<ol class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+			{
+				steps.map((step, i) => (
+					<li class="rounded-card border border-stone-200 bg-paper p-6 shadow-lift">
+						<span
+							aria-hidden="true"
+							class="grid h-8 w-8 place-items-center rounded-full bg-ink text-sm font-medium text-paper"
+						>
+							{i + 1}
+						</span>
+						<h3 class="mt-4 font-display text-lg leading-snug">{step.title}</h3>
+						<p class="mt-2 text-sm leading-relaxed text-stone-600">{step.detail}</p>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
+	<section class="container-prose pb-8">
+		<div class="editorial border-t border-stone-200 pt-12">
+			<h2>Getting a preview worth trusting</h2>
+			<p>
+				The alignment is only as good as the two points you give it, so it is worth clicking
+				carefully — the centre of each pupil, not the corner of the eye. A couple of pixels of
+				error is invisible; a centimetre is not, and it shows up as a hairstyle that sits
+				slightly too high or slightly askew.
+			</p>
+			<p>
+				The photo matters as much as the clicks. The hairstyle assets are drawn front-on, so
+				a photo taken from the front fits convincingly and a three-quarter angle does not.
+				Keep your head level, use even light rather than strong side light, and push existing
+				hair back off your forehead if you can — the overlay sits on top of what is already
+				there, so a large existing fringe will show through around the edges.
+			</p>
+			<h3>What to look at</h3>
+			<p>
+				Judge three things: where the hairline sits relative to your eyebrows, how much width
+				the shape adds or removes at your temples, and how the height on top changes the
+				apparent length of your face. Those are the things a haircut actually changes, and
+				they are the things this preview can show you honestly.
+			</p>
+			<p>
+				What it cannot show you is texture — how your own hair behaves in that shape, how it
+				parts, how it falls when it grows. For that, the written guidance on each
+				<a href="/hairstyles">hairstyle page</a> is more use than any preview.
+			</p>
+		</div>
+	</section>
+
+	<section aria-labelledby="studio-faq" class="container-page pb-20">
+		<h2 id="studio-faq" class="font-display text-3xl">Questions about the studio</h2>
+		<div class="mx-auto mt-6 max-w-3xl divide-y divide-stone-200 border-y border-stone-200">
+			{
+				faq.map((item) => (
+					<details class="group py-4">
+						<summary class="flex cursor-pointer list-none items-start justify-between gap-4 font-medium">
+							<span>{item.q}</span>
+							<span
+								aria-hidden="true"
+								class="mt-1 shrink-0 text-copper-600 transition-transform group-open:rotate-45"
+							>
+								+
+							</span>
+						</summary>
+						<p class="mt-3 text-[0.95rem] leading-relaxed text-stone-600">{item.a}</p>
+					</details>
+				))
+			}
+		</div>
+	</section>
+</BaseLayout>

@@ -1,0 +1,51 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+
+interface Props {
+	/** Applied to <html> only when a page needs a different ground colour. */
+	bodyClass?: string;
+}
+const { bodyClass = '' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-GB">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content="#faf7f2" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link
+			rel="preload"
+			as="font"
+			type="font/woff2"
+			href="/fonts/fraunces-latin.woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			as="font"
+			type="font/woff2"
+			href="/fonts/inter-latin.woff2"
+			crossorigin
+		/>
+		<link rel="sitemap" href="/sitemap.xml" />
+		<slot name="head" />
+	</head>
+	<body class={bodyClass}>
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
+		>
+			Skip to content
+		</a>
+		<Header />
+		<main id="main">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>

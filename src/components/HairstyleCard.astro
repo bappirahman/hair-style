@@ -1,0 +1,73 @@
+---
+import { Image } from 'astro:assets';
+
+import type { Hairstyle } from '../lib/catalog.ts';
+import { hairImage } from '../lib/images.ts';
+import { LENGTH_LABEL, MAINTENANCE_LABEL } from '../lib/taxonomy.ts';
+
+interface Props {
+	style: Hairstyle;
+	/** The first row of cards on a page should not lazy-load. */
+	eager?: boolean;
+	sizes?: string;
+}
+
+const {
+	style,
+	eager = false,
+	sizes = '(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 88vw',
+} = Astro.props;
+const { data } = style;
+---
+
+<article
+	class="group relative flex flex-col overflow-hidden rounded-card border border-stone-200 bg-paper shadow-lift transition-[transform,box-shadow] duration-300 ease-out-soft hover:-translate-y-0.5 hover:shadow-lift-lg"
+	data-name={data.name.toLowerCase()}
+	data-categories={data.categories.join(' ')}
+	data-length={data.length}
+	data-hair-types={data.hairTypes.join(' ')}
+	data-face-shapes={data.faceShapes.join(' ')}
+	data-maintenance={data.maintenance}
+>
+	<div class="relative overflow-hidden bg-stone-100">
+		<Image
+			src={hairImage(data.overlay)}
+			alt={data.imageAlt}
+			widths={[320, 480, 640]}
+			sizes={sizes}
+			loading={eager ? 'eager' : 'lazy'}
+			decoding={eager ? 'sync' : 'async'}
+			fetchpriority={eager ? 'high' : 'auto'}
+			class="aspect-4/5 w-full object-cover transition-transform duration-500 ease-out-soft group-hover:scale-[1.03]"
+		/>
+		{
+			data.trending && (
+				<span class="absolute left-3 top-3 rounded-full bg-copper-600 px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider text-paper">
+					Trending
+				</span>
+			)
+		}
+	</div>
+
+	<div class="flex flex-1 flex-col p-4">
+		<h3 class="font-display text-lg leading-tight">
+			<a href={`/hairstyles/${style.id}`} class="after:absolute after:inset-0">
+				{data.name}
+			</a>
+		</h3>
+		<p class="mt-1.5 line-clamp-2 text-sm leading-relaxed text-stone-600">
+			{data.summary}
+		</p>
+		<dl class="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-2xs text-stone-500">
+			<div class="flex gap-1">
+				<dt class="sr-only">Length</dt>
+				<dd>{LENGTH_LABEL[data.length]}</dd>
+			</div>
+			<span aria-hidden="true" class="text-stone-300">&middot;</span>
+			<div class="flex gap-1">
+				<dt class="sr-only">Maintenance</dt>
+				<dd>{MAINTENANCE_LABEL[data.maintenance]}</dd>
+			</div>
+		</dl>
+	</div>
+</article>

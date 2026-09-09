@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Generated hairstyle overlays are fetched by the studio at runtime; there is
+# nothing to index inside them.
+Disallow: /overlays/
+
+Sitemap: https://hairstylepreview.com/sitemap.xml
